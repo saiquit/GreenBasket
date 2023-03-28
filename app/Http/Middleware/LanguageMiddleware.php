@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+
+class LanguageMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        if (!Session::has('locale')) {
+            Session::put('locale', Config::get('app.locale'));
+        }
+        if (in_array($request->query('lang'), Config::get('app.available_locales'))) {
+            App::setLocale($request->query('lang'));
+            Session::put('locale', $request->query('lang'));
+            $request->query('lang', session('locale'));
+            return $next($request);
+        } else {
+            App::setLocale(Config::get('app.available_locales.English'));
+            Session::put(Config::get('app.available_locales.English'));
+            $route_name = Route::currentRouteName();
+            return redirect()->route($route_name, ['lang' => session('locale')]);
+        }
+        // dd($request);
+        return $next($request);
+    }
+}
