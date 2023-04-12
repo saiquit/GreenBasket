@@ -20,19 +20,21 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Session::has('locale')) {
-            Session::put('locale', Config::get('app.locale'));
-        }
-        if (in_array($request->query('lang'), Config::get('app.available_locales'))) {
-            App::setLocale($request->query('lang'));
-            Session::put('locale', $request->query('lang'));
-            $request->query('lang', session('locale'));
-            return $next($request);
-        } else {
-            App::setLocale(Config::get('app.available_locales.English'));
-            Session::put(Config::get('app.available_locales.English'));
-            $route_name = Route::currentRouteName();
-            return redirect()->route($route_name, ['lang' => session('locale')]);
+        if ($request->method() == 'GET') {
+            if (!Session::has('locale')) {
+                Session::put('locale', Config::get('app.locale'));
+            }
+            if (in_array($request->query('lang'), Config::get('app.available_locales'))) {
+                App::setLocale($request->query('lang'));
+                Session::put('locale', $request->query('lang'));
+                $request->query('lang', session('locale'));
+                return $next($request);
+            } else {
+                App::setLocale(Config::get('app.available_locales.English'));
+                Session::put(Config::get('app.available_locales.English'));
+                $route_name = Route::currentRouteName();
+                return redirect()->route($route_name, ['lang' => session('locale')]);
+            }
         }
         // dd($request);
         return $next($request);

@@ -31,7 +31,7 @@
             <div class="row">
                 @if ($products->count())
                     @foreach ($products as $product)
-                        <div class="col-md-6 col-lg-3 ftco-animate">
+                        <div class="col-6 col-md-6 col-lg-3 ftco-animate">
                             <div class="product">
                                 <a href="{{ route('front.single', ['slug' => $product->slug, 'lang' => app()->getLocale()]) }}"
                                     class="img-prod"><img class="img-fluid"
